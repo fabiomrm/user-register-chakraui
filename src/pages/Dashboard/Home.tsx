@@ -1,10 +1,13 @@
-import { Flex, Container, Stack, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, InputGroup, Input, InputLeftElement } from '@chakra-ui/react';
+import { Flex, Container, Stack, Button, Modal, ModalOverlay, 
+    ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, 
+    useDisclosure, InputGroup, Input, InputLeftElement, Text } from '@chakra-ui/react';
 import { AtSignIcon, EmailIcon, PhoneIcon } from '@chakra-ui/icons';
 import { Header } from '../../components/Header';
 import { UsersList } from './UsersList';
 import { Searchbar } from '../../components/Searchbar';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import { User } from '../../types/User';
 
@@ -12,10 +15,14 @@ let id = 1;
 
 export const Home = () => {
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const modalAddUser = useDisclosure();
+    const modalLogout = useDisclosure();
+    const navigate = useNavigate();
+
     const { register, handleSubmit, setValue } = useForm<User>();
     const [users, setUsers] = useState<Array<User>>([]);
     const [editingUser, setEditingUser] = useState<User | null>();
+    const [showPopUp, setShowPopUp] = useState<Boolean>(false);
 
 
     const saveUser: SubmitHandler<User> = (data): void => {
@@ -39,7 +46,7 @@ export const Home = () => {
         setValue("email", "");
         setValue("phone", "");
         
-        onClose();
+        modalAddUser.onClose();
     }
 
     const edit = (user: User) => {
@@ -48,9 +55,20 @@ export const Home = () => {
         setValue("email", user.email);
         setValue("phone", user.phone);
 
-        onOpen();
+        modalAddUser.onOpen();
     };
 
+    const showLogoutPopup = () => {
+        modalLogout.onOpen();
+    };
+
+    const logout = () => {
+
+        localStorage.removeItem("token");
+        
+        modalLogout.onClose();
+        navigate('/');
+    };
 
     return (
         <Flex
@@ -59,73 +77,88 @@ export const Home = () => {
             height="100vh"
             backgroundColor="gray.200"
         >
-        <Header />
-        <Container maxW="container.lg">
-            <Stack
-                mt={4}
-            >
-                {/* SEARCH BAR */}
-                <Searchbar />
+            <Header onLogout={showLogoutPopup}/>
 
-                {/* ADD BUTTON */}
-                <Flex justifyContent="flex-end">
-                    <Button 
-                        type="button" 
-                        variant="solid" 
-                        colorScheme="green"
-                        onClick={onOpen}
-                    >
-                        Adicionar
-                    </Button>
-                </Flex>
+            <Container maxW="container.lg">
+                <Stack
+                    mt={4}
+                >
+                    {/* SEARCH BAR */}
+                    <Searchbar />
 
-                {/* USERS LIST */}
-                <UsersList users={users} handleEdit={edit} />
-                
-            </Stack>
-        </Container>
-        {/* MODAL DE CADASTRO */}
-        <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Cadastro de Usuário</ModalHeader>
-          <ModalCloseButton />
-            <form id="form" action="" method="POST" onSubmit={handleSubmit(saveUser)}>
-            <ModalBody>
-                <Stack>
-                    <InputGroup>
-                        <InputLeftElement 
-                            pointerEvents="none"
-                            children={ <AtSignIcon color="gray.300"/>}
-                        />
+                    {/* ADD BUTTON */}
+                    <Flex justifyContent="flex-end">
+                        <Button 
+                            type="button" 
+                            variant="solid" 
+                            colorScheme="green"
+                            onClick={modalAddUser.onOpen}
+                        >
+                            Adicionar
+                        </Button>
+                    </Flex>
+
+                    {/* USERS LIST */}
+                    <UsersList users={users} handleEdit={edit} />
                         
-                        <Input type="text" placeholder="Nome de usuário" {...register("name")}/>
-                    </InputGroup>
-                    <InputGroup>
-                        <InputLeftElement 
-                            pointerEvents="none"
-                            children={ <EmailIcon color="gray.300"/>}
-                            />
-                        <Input type="email" placeholder="Endereço de email" {...register("email")} />
-                    </InputGroup>
-                    <InputGroup>
-                        <InputLeftElement 
-                            pointerEvents="none"
-                            children={ <PhoneIcon color="gray.300"/>}
-                            />
-                        <Input type="text" placeholder="Celular" {...register("phone")}/>
-                    </InputGroup>
-                </Stack> 
-            </ModalBody>
-            <ModalFooter>
-                <Button variant='ghost' onClick={onClose}>Cancelar</Button>
-                <Button type="submit" colorScheme='green' mr={3}>Salvar</Button>
-            </ModalFooter>
-            </form> 
-        </ModalContent>
-      </Modal>
+                </Stack>
+            </Container>
+            {/* MODAL DE CADASTRO */}
+            <Modal isOpen={modalAddUser.isOpen} onClose={modalAddUser.onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Cadastro de Usuário</ModalHeader>
+                    <ModalCloseButton />
+                    <form id="form" action="" method="POST" onSubmit={handleSubmit(saveUser)}>
+                        <ModalBody>
+                            <Stack>
+                                <InputGroup>
+                                    <InputLeftElement 
+                                        pointerEvents="none"
+                                        children={ <AtSignIcon color="gray.300"/>}
+                                    />
+                                    
+                                    <Input type="text" placeholder="Nome de usuário" {...register("name")}/>
+                                </InputGroup>
+                                <InputGroup>
+                                    <InputLeftElement 
+                                        pointerEvents="none"
+                                        children={ <EmailIcon color="gray.300"/>}
+                                        />
+                                    <Input type="email" placeholder="Endereço de email" {...register("email")} />
+                                </InputGroup>
+                                <InputGroup>
+                                    <InputLeftElement 
+                                        pointerEvents="none"
+                                        children={ <PhoneIcon color="gray.300"/>}
+                                        />
+                                    <Input type="text" placeholder="Celular" {...register("phone")}/>
+                                </InputGroup>
+                            </Stack> 
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant='ghost' onClick={modalAddUser.onClose}>Cancelar</Button>
+                            <Button type="submit" colorScheme='green' mr={3}>Salvar</Button>
+                        </ModalFooter>
+                    </form> 
+                </ModalContent>
+            </Modal>
 
-        
+            {/* MODAL LOGOUT */}
+            <Modal isOpen={modalLogout.isOpen} onClose={modalLogout.onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Tem certeza que deseja sair?</ModalHeader>
+                    <ModalCloseButton />
+                        <ModalBody>
+                            <Text>Você tem certeza que deseja sair?</Text>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant='ghost' onClick={modalLogout.onClose}>Cancelar</Button>
+                            <Button type="button" colorScheme='green' mr={3} onClick={logout}>Sair</Button>
+                        </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Flex>
     );
 };

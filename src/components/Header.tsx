@@ -1,6 +1,11 @@
 import { Flex, Container, Image, Text, Stack, Button } from '@chakra-ui/react';
 
-export const Header = () => {
+
+type Props = {
+    onLogout: () => void;
+};
+
+export const Header = ({ onLogout }: Props) => {
     return (
         <Flex
             backgroundColor="whiteAlpha.900"
@@ -13,7 +18,7 @@ export const Header = () => {
                         Cadastro de Clientes
                     </Text>
                     <Stack style={{marginLeft: "auto"}}>
-                        <Button variant="link">Sair</Button>
+                        <Button variant="link" onClick={() => onLogout()}>Sair</Button>
                     </Stack>
                 </Stack> 
             </Container>

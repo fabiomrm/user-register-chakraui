@@ -3,6 +3,8 @@ import { Flex, Stack, Image, Heading, Box, FormControl,
 
 import { AtSignIcon, LockIcon } from '@chakra-ui/icons';
 
+import { RouterLink } from '../../../components/RouterLink';
+
 
 export const SignUp = () => {
 return (
@@ -66,9 +68,10 @@ return (
                         <Button type="submit" variant="solid" colorScheme="green">
                             Login
                         </Button>
-                        <Button type="button" variant="link" colorScheme="green">
+                        <RouterLink to="/" variant="link" colorScheme="green">
                             Voltar
-                        </Button> 
+                        </RouterLink>
+                        
                     </Stack>
                 </form>
             </Box>

@@ -3,8 +3,19 @@ import { Flex, Stack, Image, Heading, Box, FormControl,
         Link, Button } from '@chakra-ui/react';
 import { AtSignIcon, LockIcon } from '@chakra-ui/icons';
 
+import { RouterLink } from '../../../components/RouterLink';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 export const SignIn = () => {
+
+    const { register, handleSubmit } = useForm();
+    const navigate = useNavigate();
+
+    const login = () => {
+        navigate("/home");
+    }
+
     return (
         <Flex
             flexDirection="column"
@@ -25,7 +36,7 @@ export const SignIn = () => {
                 <Box
                     minW={{base: "90%", md: "470px"}}
                 >
-                    <form action="">
+                    <form action="" onSubmit={handleSubmit(login)}>
                         <Stack
                             spacing={4}
                             p="1rem"
@@ -39,7 +50,7 @@ export const SignIn = () => {
                                         pointerEvents="none"
                                         children={<AtSignIcon color="gray.300"/>}
                                     />
-                                    <Input type="email" placeholder="Endereço de email"/>
+                                    <Input type="email" placeholder="Endereço de email" {...register("email")}/>
                                 </InputGroup>
                             </FormControl>
 
@@ -49,7 +60,7 @@ export const SignIn = () => {
                                         pointerEvents="none"
                                         children={<LockIcon color="gray.300"/>}
                                     />
-                                    <Input type="password" placeholder="Senha"/>
+                                    <Input type="password" placeholder="Senha" {...register("password")}/>
                                 </InputGroup>
                                 <FormHelperText textAlign="right">
                                         <Link>Esqueceu a senha?</Link>
@@ -65,7 +76,8 @@ export const SignIn = () => {
                 </Box>
             </Stack>
             <Box>
-                Ainda não possui cadastro? <Link color="green">Cadastre-se.</Link>
+                Ainda não possui cadastro? 
+                <RouterLink to="/signup" color="green">Cadastre-se</RouterLink>
             </Box>
         </Flex>
     );
