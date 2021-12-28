@@ -1,12 +1,20 @@
 import {Box, Table, Thead, Tr, Td, Tbody, Avatar, Button} from '@chakra-ui/react';
+import { User } from '../../types/User';
 
-export const UsersList = () => {
+type UserListProps = {
+    users: Array<User>;
+    handleEdit: (user: User) => void;
+}
+
+export const UsersList = ({ users, handleEdit }: UserListProps) => {
+
+
     return(
 
         <Box
             backgroundColor="whiteAlpha.900"
             boxShadow="md"
-            borderRdius="md"
+            borderRadius="md"
             p="1rem"
         >
             <Table>
@@ -18,15 +26,17 @@ export const UsersList = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    <Tr>
-                        <Td><Avatar bg="green"/></Td>
-                        <Td>Fulano de tal</Td>
-                        <Td textAlign="end">
-                            <Button type="button" variant="outline" colorScheme="green">
-                                Editar
-                            </Button>
-                        </Td>
-                    </Tr>
+                    {users.map((user) => (
+                        <Tr key={user.id}>
+                            <Td><Avatar bg="green"/></Td>
+                            <Td>{user.name}</Td>
+                            <Td textAlign="end">
+                                <Button type="button" variant="outline" colorScheme="green" onClick={() => handleEdit(user)}>
+                                    Editar
+                                </Button>
+                            </Td>
+                        </Tr>
+                    ))}
                 </Tbody>
             </Table>
         </Box>
