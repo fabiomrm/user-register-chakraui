@@ -1,19 +1,39 @@
 import { Flex, Stack, Image, Heading, Box, FormControl, 
         InputGroup, InputLeftElement, Input, FormHelperText, 
-        Link, Button } from '@chakra-ui/react';
+        Link, Button, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { AtSignIcon, LockIcon } from '@chakra-ui/icons';
 
 import { RouterLink } from '../../../components/RouterLink';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export const SignIn = () => {
 
     const { register, handleSubmit } = useForm();
     const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const login = () => {
-        navigate("/home");
+    const login = (payload: any) => {
+
+       setErrorMessage('');
+
+       fetch("http://localhost:3001/v1/signin", {
+           headers: {
+               "Content-Type": "application/json"
+           },
+           method: "POST",
+           body: JSON.stringify(payload)
+       }).then(async (response) => {
+           const json = await response.json();
+           if(response.ok) {
+               localStorage.setItem("token", json.token)
+               navigate("/home")
+           } else {
+               console.log(json.message);
+               setErrorMessage(json.message);
+           }
+       })
     }
 
     return (
@@ -69,7 +89,15 @@ export const SignIn = () => {
                             <Button type="submit" variant="solid" colorScheme="green">
                                 Login
                             </Button>
-                            
+                            {
+                                errorMessage && (
+                                    <Alert status='error'>
+                                        <AlertIcon />
+                                        <AlertTitle mr={2}>Dados incorretos!</AlertTitle>
+                                        <AlertDescription>{errorMessage}</AlertDescription>
+                                    </Alert>  
+                                )
+                            }
                         </Stack>
                     </form>
 
@@ -79,6 +107,7 @@ export const SignIn = () => {
                 Ainda não possui cadastro? 
                 <RouterLink to="/signup" color="green">Cadastre-se</RouterLink>
             </Box>
+            
         </Flex>
     );
 }

@@ -22,7 +22,6 @@ export const Home = () => {
     const { register, handleSubmit, setValue } = useForm<User>();
     const [users, setUsers] = useState<Array<User>>([]);
     const [editingUser, setEditingUser] = useState<User | null>();
-    const [showPopUp, setShowPopUp] = useState<Boolean>(false);
 
 
     const saveUser: SubmitHandler<User> = (data): void => {
