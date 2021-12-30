@@ -5,7 +5,7 @@ import { AtSignIcon, EmailIcon, PhoneIcon } from '@chakra-ui/icons';
 import { Header } from '../../components/Header';
 import { UsersList } from './UsersList';
 import { Searchbar } from '../../components/Searchbar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +21,27 @@ export const Home = () => {
 
     const { register, handleSubmit, setValue } = useForm<User>();
     const [users, setUsers] = useState<Array<User>>([]);
+    const [user, setUser] = useState<User>();
     const [editingUser, setEditingUser] = useState<User | null>();
+
+    useEffect(() => {
+        fetch("http://localhost:3001/v1/users/me", {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        }).then(async response => {
+            const json = await response.json();
+
+            if(response.ok) {
+                setUser(json.user)
+            } else {
+                console.log((json.message));
+            }
+        })
+        .catch(e => console.log(e));
+        
+    }, [])
 
 
     const saveUser: SubmitHandler<User> = (data): void => {
@@ -82,6 +102,7 @@ export const Home = () => {
                 <Stack
                     mt={4}
                 >
+                    <Text>{user?.name || "-"} ({user?.email})</Text>
                     {/* SEARCH BAR */}
                     <Searchbar />
 
