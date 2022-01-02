@@ -10,19 +10,20 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { User } from '../../types/User';
+import { Customer } from '../../types/Customer';
 
 let id = 1;
 
 export const Home = () => {
 
-    const modalAddUser = useDisclosure();
+    const modalAddCustomer = useDisclosure();
     const modalLogout = useDisclosure();
     const navigate = useNavigate();
 
     const { register, handleSubmit, setValue } = useForm<User>();
-    const [users, setUsers] = useState<Array<User>>([]);
     const [user, setUser] = useState<User>();
-    const [editingUser, setEditingUser] = useState<User | null>();
+    const [customers, setCustomers] = useState<Array<Customer>>([]);
+    const [editingCustomer, setEditingCustomer] = useState<Customer | null>();
 
     useEffect(() => {
         fetch("http://localhost:3001/v1/users/me", {
@@ -35,46 +36,68 @@ export const Home = () => {
 
             if(response.ok) {
                 setUser(json.user)
+               
             } else {
                 console.log((json.message));
             }
         })
         .catch(e => console.log(e));
+        getCustomers()
         
     }, [])
 
-
-    const saveUser: SubmitHandler<User> = (data): void => {
-        let usersCopy = [...users];
-        if(editingUser) {
-            usersCopy = usersCopy.filter(user => user.id !== editingUser.id);
-            data.id = editingUser.id;
-        }
-        else {
-            data.id = id;
-            id++;
-        }
-        usersCopy.push(data);
-        usersCopy.sort((a, b) => {
-            return a.name.localeCompare(b.name);
+    const getCustomers = () => {
+        fetch("http://localhost:3001/v1/customers", {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
         })
-        setUsers(usersCopy);
-
-        console.log(data)
-        setValue("name", "");
-        setValue("email", "");
-        setValue("phone", "");
-        
-        modalAddUser.onClose();
+        .then(async (res) => {
+            const json = await res.json();
+            if(res.ok) {
+                console.log(json)
+                setCustomers(json)
+            } else {
+                console.log(`Error: ${json.message}`)
+            }
+        })
     }
 
-    const edit = (user: User) => {
-        setEditingUser(user);
-        setValue("name", user.name);
-        setValue("email", user.email);
-        setValue("phone", user.phone);
 
-        modalAddUser.onOpen();
+    const saveCustomer: SubmitHandler<Customer> = (data): void => {
+        modalAddCustomer.onClose();
+
+        fetch('http://localhost:3001/v1/customers', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                body: JSON.stringify(data),
+            }
+        })
+        .then(async (response) => {
+            const json = await response.json();
+            if(response.ok) {
+                setValue("name", "");
+                setValue("email", "");
+                setValue("phone", "");
+
+                getCustomers()
+            } else {
+                console.log(`Error: ${json.message}`)
+            }
+        })
+    }
+
+    const edit = (customer: Customer) => {
+        setEditingCustomer(customer);
+        setValue("name", customer.name);
+        setValue("email", customer.email);
+        setValue("phone", customer.phone);
+
+        modalAddCustomer.onOpen();
     };
 
     const showLogoutPopup = () => {
@@ -112,24 +135,24 @@ export const Home = () => {
                             type="button" 
                             variant="solid" 
                             colorScheme="green"
-                            onClick={modalAddUser.onOpen}
+                            onClick={modalAddCustomer.onOpen}
                         >
                             Adicionar
                         </Button>
                     </Flex>
 
                     {/* USERS LIST */}
-                    <UsersList users={users} handleEdit={edit} />
+                    <UsersList customers={customers} handleEdit={edit} />
                         
                 </Stack>
             </Container>
             {/* MODAL DE CADASTRO */}
-            <Modal isOpen={modalAddUser.isOpen} onClose={modalAddUser.onClose}>
+            <Modal isOpen={modalAddCustomer.isOpen} onClose={modalAddCustomer.onClose}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Cadastro de Usuário</ModalHeader>
                     <ModalCloseButton />
-                    <form id="form" action="" method="POST" onSubmit={handleSubmit(saveUser)}>
+                    <form id="form" action="" method="POST" onSubmit={handleSubmit(saveCustomer)}>
                         <ModalBody>
                             <Stack>
                                 <InputGroup>
@@ -157,7 +180,7 @@ export const Home = () => {
                             </Stack> 
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant='ghost' onClick={modalAddUser.onClose}>Cancelar</Button>
+                            <Button variant='ghost' onClick={modalAddCustomer.onClose}>Cancelar</Button>
                             <Button type="submit" colorScheme='green' mr={3}>Salvar</Button>
                         </ModalFooter>
                     </form> 

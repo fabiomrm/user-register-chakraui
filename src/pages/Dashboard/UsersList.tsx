@@ -1,12 +1,13 @@
 import {Box, Table, Thead, Tr, Td, Tbody, Avatar, Button} from '@chakra-ui/react';
-import { User } from '../../types/User';
 
-type UserListProps = {
-    users: Array<User>;
-    handleEdit: (user: User) => void;
+import { Customer } from '../../types/Customer';
+
+type CustomerListProps = {
+    customers?: Array<Customer>;
+    handleEdit: (customer: Customer) => void;
 }
 
-export const UsersList = ({ users, handleEdit }: UserListProps) => {
+export const UsersList = ({ customers, handleEdit }: CustomerListProps) => {
 
 
     return(
@@ -26,12 +27,12 @@ export const UsersList = ({ users, handleEdit }: UserListProps) => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {users.map((user) => (
-                        <Tr key={user.id}>
+                    {customers && customers.map((customer) => (
+                        <Tr key={customer.id}>
                             <Td><Avatar bg="green"/></Td>
-                            <Td>{user.name}</Td>
+                            <Td>{customer.name}</Td>
                             <Td textAlign="end">
-                                <Button type="button" variant="outline" colorScheme="green" onClick={() => handleEdit(user)}>
+                                <Button type="button" variant="outline" colorScheme="green" onClick={() => handleEdit(customer)}>
                                     Editar
                                 </Button>
                             </Td>
