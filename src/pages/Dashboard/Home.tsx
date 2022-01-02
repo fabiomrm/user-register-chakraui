@@ -74,8 +74,8 @@ export const Home = () => {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-                body: JSON.stringify(data),
-            }
+            },
+            body: JSON.stringify(data),
         })
         .then(async (response) => {
             const json = await response.json();
