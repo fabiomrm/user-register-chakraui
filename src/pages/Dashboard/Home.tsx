@@ -69,6 +69,10 @@ export const Home = () => {
     const saveCustomer: SubmitHandler<Customer> = (data): void => {
         modalAddCustomer.onClose();
 
+        if(editingCustomer?.id && editingCustomer?.id > 0 ) {
+            data.id = editingCustomer?.id;
+        }
+
         fetch('http://localhost:3001/v1/customers', {
             method: "POST",
             headers: {
