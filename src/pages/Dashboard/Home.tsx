@@ -28,6 +28,7 @@ export const Home = () => {
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>();
     const [file, setFile] = useState<any | null>(null);
     const [pictureBase64, setPictureBase64] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         fetch("http://localhost:3001/v1/users/me", {
@@ -182,6 +183,11 @@ export const Home = () => {
         navigate('/');
     };
 
+    const filteredCustomers = searchTerm.trim().length > 0 ? 
+        customers.filter(
+            (customer) => customer.name.toLowerCase().indexOf(searchTerm.trim().toLowerCase()) >= 0)
+                : customers
+
     return (
         <Flex
             flexDirection="column"
@@ -197,7 +203,7 @@ export const Home = () => {
                 >
                     <Text>{user?.name || "-"} ({user?.email})</Text>
                     {/* SEARCH BAR */}
-                    <Searchbar />
+                    <Searchbar onTextChange={(text) => setSearchTerm(text)}/>
 
                     {/* ADD BUTTON */}
                     <Flex justifyContent="flex-end">
@@ -212,7 +218,7 @@ export const Home = () => {
                     </Flex>
 
                     {/* USERS LIST */}
-                    <UsersList customers={customers} handleEdit={edit} />
+                    <UsersList customers={filteredCustomers} handleEdit={edit} />
                         
                 </Stack>
             </Container>

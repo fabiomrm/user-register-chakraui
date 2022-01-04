@@ -1,7 +1,11 @@
 import { Box, InputLeftElement, InputGroup, Input } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 
-export const Searchbar = () => {
+type Props = {
+    onTextChange: (text: string) => void
+}
+
+export const Searchbar = ({ onTextChange }: Props) => {
     return (
         <Box
             backgroundColor="whiteAlpha.900"
@@ -11,7 +15,7 @@ export const Searchbar = () => {
         >
             <InputGroup>
                 <InputLeftElement pointerEvents="none" children={ <SearchIcon color="green"/> } />
-                <Input type="text" placeholder="Buscar" />
+                <Input type="text" placeholder="Buscar" onChange={(e) => onTextChange(e.target.value)} />
             </InputGroup>
         </Box>
     )
