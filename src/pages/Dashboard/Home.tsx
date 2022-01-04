@@ -1,6 +1,6 @@
 import { Flex, Container, Stack, Button, Modal, ModalOverlay, 
     ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, 
-    useDisclosure, InputGroup, Input, InputLeftElement, Text } from '@chakra-ui/react';
+    useDisclosure, InputGroup, Input, InputLeftElement, Text, Avatar, Image } from '@chakra-ui/react';
 import { AtSignIcon, EmailIcon, PhoneIcon } from '@chakra-ui/icons';
 import { Header } from '../../components/Header';
 import { UsersList } from './UsersList';
@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { User } from '../../types/User';
 import { Customer } from '../../types/Customer';
 
-let id = 1;
+
 
 export const Home = () => {
 
@@ -22,8 +22,11 @@ export const Home = () => {
 
     const { register, handleSubmit, setValue } = useForm<User>();
     const [user, setUser] = useState<User>();
+
     const [customers, setCustomers] = useState<Array<Customer>>([]);
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>();
+    const [file, setFile] = useState<any | null>(null);
+    const [pictureBase64, setPictureBase64] = useState("");
 
     useEffect(() => {
         fetch("http://localhost:3001/v1/users/me", {
@@ -57,14 +60,68 @@ export const Home = () => {
         .then(async (res) => {
             const json = await res.json();
             if(res.ok) {
-                console.log(json)
+                
                 setCustomers(json)
+                
+                
             } else {
                 console.log(`Error: ${json.message}`)
             }
         })
     }
 
+    const selectProfilePicture = () => {
+        document.getElementById('avatar-input')?.click();
+        
+    }
+
+    const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if(e.target.files) {
+            const profileFile = e.target.files[0];
+           
+
+            setFile(profileFile);
+
+            const reader = new FileReader();
+
+            reader.readAsDataURL(profileFile);
+            reader.onload = function() {           
+
+                console.log(reader.result);
+                setPictureBase64(reader.result as string);
+            };
+
+            reader.onerror = function (error) {
+                console.log("Error: " + error);
+            }
+        }
+    }
+
+    const savePicture = (id: number) => {
+        const formData = new FormData();
+
+        formData.append("profile-picture", file);
+        formData.append("id", id.toString());
+        fetch("http://localhost:3001/v1/costumers/profile-picture", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            method: "POST",
+            body: formData,
+        }).then(async (response) => {
+           
+            const json = await response.json();
+            if(response.ok) {
+                
+               
+                getCustomers();
+
+            } else {
+               
+                console.log(json.message)
+            }
+        }).catch(e => console.log(e))
+    }
 
     const saveCustomer: SubmitHandler<Customer> = (data): void => {
         modalAddCustomer.onClose();
@@ -88,7 +145,15 @@ export const Home = () => {
                 setValue("email", "");
                 setValue("phone", "");
 
-                getCustomers()
+                if(file) {
+                    
+                    
+                    savePicture(json.id);
+
+                } else {
+                    getCustomers()
+                }
+
             } else {
                 console.log(`Error: ${json.message}`)
             }
@@ -159,13 +224,38 @@ export const Home = () => {
                     <form id="form" action="" method="POST" onSubmit={handleSubmit(saveCustomer)}>
                         <ModalBody>
                             <Stack>
+                                {
+                                    pictureBase64.length > 0 ? 
+                                    (
+                                        <Image src={pictureBase64}
+                                            boxSize={20}
+                                            objectFit="cover"
+                                            style={{cursor: "pointer"}}
+                                            onClick={selectProfilePicture}
+                                        />
+                                    ) :
+                                    (
+                                        <Avatar 
+                                            bg="green" 
+                                            style={{cursor: "pointer"}} 
+                                            onClick={selectProfilePicture}
+                                        />
+                                    )
+                                }
+                                <input
+                                    style={{display: "none"}}
+                                    type="file"
+                                    id="avatar-input"
+                                    accept="image/png, image/jpeg"
+                                    onChange={onFileSelected}
+                                />
                                 <InputGroup>
                                     <InputLeftElement 
                                         pointerEvents="none"
                                         children={ <AtSignIcon color="gray.300"/>}
                                     />
                                     
-                                    <Input type="text" placeholder="Nome de usuário" {...register("name")}/>
+                                    <Input type="text" placeholder="Nome de cliente" {...register("name")}/>
                                 </InputGroup>
                                 <InputGroup>
                                     <InputLeftElement 
