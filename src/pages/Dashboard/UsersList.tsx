@@ -1,4 +1,5 @@
-import {Box, Table, Thead, Tr, Td, Tbody, Avatar, Image, Button} from '@chakra-ui/react';
+import {Box, Table, Thead, Tr, Td, Tbody, Button} from '@chakra-ui/react';
+import { CustomerPicture } from '../../components/CustomerPicture';
 
 import { Customer } from '../../types/Customer';
 
@@ -30,11 +31,8 @@ export const UsersList = ({ customers, handleEdit }: CustomerListProps) => {
                     {customers && customers.map((customer) => (
                         <Tr key={customer.id}>
                             <Td>
-                                {
-                                    customer.pictureUrl ? <Image src={customer.pictureUrl}/>
-                                    :
-                                    <Avatar bg="green"/>
-                                }
+                                <CustomerPicture customer={customer} />
+                               
                             </Td>
                             <Td>{customer.name}</Td>
                             <Td textAlign="end">

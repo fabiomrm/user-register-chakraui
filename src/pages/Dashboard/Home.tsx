@@ -1,6 +1,6 @@
 import { Flex, Container, Stack, Button, Modal, ModalOverlay, 
     ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, 
-    useDisclosure, InputGroup, Input, InputLeftElement, Text, Avatar, Image } from '@chakra-ui/react';
+    useDisclosure, InputGroup, Input, InputLeftElement, Text } from '@chakra-ui/react';
 import { AtSignIcon, EmailIcon, PhoneIcon } from '@chakra-ui/icons';
 import { Header } from '../../components/Header';
 import { UsersList } from './UsersList';
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { User } from '../../types/User';
 import { Customer } from '../../types/Customer';
+import { CustomerPicture } from '../../components/CustomerPicture';
 
 
 
@@ -224,24 +225,11 @@ export const Home = () => {
                     <form id="form" action="" method="POST" onSubmit={handleSubmit(saveCustomer)}>
                         <ModalBody>
                             <Stack>
-                                {
-                                    pictureBase64.length > 0 ? 
-                                    (
-                                        <Image src={pictureBase64}
-                                            boxSize={20}
-                                            objectFit="cover"
-                                            style={{cursor: "pointer"}}
-                                            onClick={selectProfilePicture}
-                                        />
-                                    ) :
-                                    (
-                                        <Avatar 
-                                            bg="green" 
-                                            style={{cursor: "pointer"}} 
-                                            onClick={selectProfilePicture}
-                                        />
-                                    )
-                                }
+                                <CustomerPicture 
+                                    pictureBase64={pictureBase64}
+                                    customer={editingCustomer}
+                                    selectProfilePicture={selectProfilePicture}
+                                />
                                 <input
                                     style={{display: "none"}}
                                     type="file"
